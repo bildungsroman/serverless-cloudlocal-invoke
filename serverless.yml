@@ -26,10 +26,6 @@ functions:
         Resource: '*'
       - Effect: Allow
         Action:
-          - sqs:SendMessage*
-        Resource: !GetAtt Queue.Arn
-      - Effect: Allow
-        Action:
           - dynamodb:GetItem
           - dynamodb:DeleteItem
           - dynamodb:PutItem
