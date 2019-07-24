@@ -8,12 +8,11 @@ plugins:
   - serverless-iam-roles-per-function
   - serverless-cf-vars
 functions:
-  Function:
+  writeItems:
     handler: index.handler
-    description:
-      Fn::Sub:
-        - 'Stack #{StackTagName} Environment #{EnvironmentTagName} Function #{ResourceName}'
-        - ResourceName: Function
+    description: !Sub
+      - 'Stack #{StackTagName} Environment #{EnvironmentTagName} Function #{ResourceName}'
+      - ResourceName: writeItems
     runtime: nodejs8.10
     tracing: Active
     iamRoleStatements:
@@ -28,34 +27,44 @@ functions:
       - Effect: Allow
         Action:
           - sqs:SendMessage*
+        Resource: !GetAtt Queue.Arn
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+          - dynamodb:DeleteItem
+          - dynamodb:PutItem
+          - dynamodb:Scan
+          - dynamodb:Query
+          - dynamodb:UpdateItem
+          - dynamodb:BatchWriteItem
+          - dynamodb:BatchGetItem
         Resource:
-          Fn::GetAtt:
-            - Queue
-            - Arn
+          - !GetAtt Items.Arn
+          - !Sub '#{Items.Arn}/index/*'
     environment:
-      QUEUE_NAME:
-        Fn::GetAtt:
-          - Queue
-          - QueueName
-      QUEUE_ARN:
-        Fn::GetAtt:
-          - Queue
-          - Arn
-      QUEUE_URL:
-        Ref: Queue
+      TABLE_NAME: !Ref Items
+      TABLE_ARN: !GetAtt Items.Arn
 resources:
   Parameters:
     StackTagName:
       Type: String
       Description: Stack Name (injected by Stackery at deployment time)
-      Default: node8-serverless
+      Default: serverless-cloudlocal-invoke
     EnvironmentTagName:
       Type: String
       Description: Environment Name (injected by Stackery at deployment time)
       Default: dev
   Resources:
-    Queue:
-      Type: AWS::SQS::Queue
+    Items:
+      Type: AWS::DynamoDB::Table
       Properties:
-        QueueName:
-          Fn::Sub: '#{AWS::StackName}-Queue'
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        BillingMode: PAY_PER_REQUEST
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+        TableName: !Sub '#{AWS::StackName}-Items'
