@@ -1,28 +1,22 @@
-// Load AWS SDK and create a new Dynamodb object
+// Load AWS SDK and create a new SQS object
 const AWS = require("aws-sdk");
-const dynamodb = new AWS.DynamoDB.DocumentClient();
-const tableName = process.env.TABLE_NAME; // supplied by Function service-discovery wire
+const sqs = new AWS.SQS();
+const queueUrl = process.env.QUEUE_URL; // supplied by Function service-discovery wire
+const queueName = process.env.QUEUE_NAME;
+const queueArn = process.env.QUEUE_ARN;
 
-exports.handler = async () => {
-  console.log("Table Name: ", tableName);
+exports.handler = async message => {
+  console.log("Queue Name: ", queuename);
+  console.log("Queue ARN ", queueArn);
+  console.log("Queue URL", queueUrl);
 
-  // Construct parameters for the table
+  // Construct parameters for the sendMessage call
   const params = {
-    TableName: tableName,
-    Item: {
-      id: `item-1`,
-      content: `Some content`
-    },
-    ConditionExpression: 'attribute_not_exists(id)', // do not overwrite existing entries
-    ReturnConsumedCapacity: 'TOTAL'
+    MessageBody: 'New Job',
+    QueueUrl: queueUrl
   };
 
-  try {
-    await dynamodb.put(params).promise();
-    console.log(`Writing item to table ${tableName}`);
-  } catch (err) {
-    console.log(err);
-  }
+  await sqs.sendMessage(params).promise();
 
-  return 'Done!';
+  return 'Job sent to queue: ' + queueName;
 }
