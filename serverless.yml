@@ -40,6 +40,7 @@ functions:
     environment:
       TABLE_NAME: !Ref Items
       TABLE_ARN: !GetAtt Items.Arn
+    timeout: 300
 resources:
   Parameters:
     StackTagName:
