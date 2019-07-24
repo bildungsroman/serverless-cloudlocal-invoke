@@ -1,0 +1,11 @@
+{
+  "name": "function",
+  "version": "1.0.0",
+  "dependencies": {
+    "aws-sdk": "~2"
+  },
+  "devDependencies": {
+    "serverless-cf-vars": "^0.3.1",
+    "serverless-iam-roles-per-function": "^2.0.1"
+  }
+}
