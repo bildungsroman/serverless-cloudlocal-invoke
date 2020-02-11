@@ -2,7 +2,7 @@ service: serverless-cloudlocal
 frameworkVersion: '>=1.2.0 <2.0.0'
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs12.x
 plugins:
   - serverless-iam-roles-per-function
   - serverless-cf-vars
@@ -13,7 +13,7 @@ functions:
       Fn::Sub:
         - 'Stack #{StackTagName} Environment #{EnvironmentTagName} Function #{ResourceName}'
         - ResourceName: Function
-    runtime: nodejs8.10
+    runtime: nodejs12.x
     tracing: Active
     iamRoleStatements:
       - Effect: Allow
@@ -47,7 +47,7 @@ resources:
     StackTagName:
       Type: String
       Description: Stack Name (injected by Stackery at deployment time)
-      Default: node8-serverless
+      Default: serverless-cloudlocal
     EnvironmentTagName:
       Type: String
       Description: Environment Name (injected by Stackery at deployment time)

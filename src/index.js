@@ -6,17 +6,22 @@ const queueName = process.env.QUEUE_NAME;
 const queueArn = process.env.QUEUE_ARN;
 
 exports.handler = async message => {
-  console.log("Queue Name: ", queuename);
+  console.log("Queue Name: ", queueName);
   console.log("Queue ARN ", queueArn);
   console.log("Queue URL", queueUrl);
 
   // Construct parameters for the sendMessage call
   const params = {
-    MessageBody: 'New Job',
+    MessageBody: 'While interacting with actual deployed resources!',
     QueueUrl: queueUrl
   };
 
-  await sqs.sendMessage(params).promise();
+  try {
+    await sqs.sendMessage(params).promise();
+  } catch (err) {
+    console.log(err);
+  }
+
 
   return 'Job sent to queue: ' + queueName;
 }
